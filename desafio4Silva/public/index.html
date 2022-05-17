@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Desafio 4 Backend</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <script>
+        const updateAction = (idForm, event) => {
+            let form = document.getElementById(idForm);
+            if(event.key === 'Backspace'){
+                if(form.action[form.action.length - 1] !== '/'){
+                    form.action = form.action.slice(0, -1);
+                }
+            }else if(!isNaN(Number(event.key))){
+                form.action += event.key;
+            }
+        }
+    </script>
+
+    <div class="container mb-3">
+      <h2>Cargar producto</h2>
+      <form method="post" enctype="application/json" action="./api/productos">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" required class="form-control" name="title"/>
+        </div>
+        <div class="mb-3">
+          <label for="precio" class="form-label">Precio</label>
+          <input type="number" required class="form-control" name="price"/>
+        </div>
+        <div class="mb-3">
+          <label for="imagen" class="form-label">URL de Imagen</label>
+          <input class="form-control" required type="text" name="thumbnail" />
+        </div>
+        <button type="submit" class="btn btn-primary">Cargar producto</button>
+      </form>
+    </div>
+
+    <div class="container mb-3">
+      <h2>Ver productos</h2>
+      <form method="get" enctype="application/json" action="./api/productos/" id="formVerId">
+        <div class="mb-3">
+            <label for="id" class="form-label">ID del producto</label>
+            <input type="number" required class="form-control" onkeydown="updateAction('formVerId', event)"/>
+        </div>
+        <a href="./api/productos"><button type="button" class="btn btn-primary">Ver todos los productos</button></a> 
+        <button type="submit" class="btn btn-primary">Buscar producto por ID</button>
+      </form>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

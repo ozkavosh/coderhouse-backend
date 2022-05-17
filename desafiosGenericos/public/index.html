@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <span></span> <!-- para inyectar el resultado -->
+  <!-- incluir handlebars desde el CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+  <script>
+    function saludar(){
+      alert('Hola!');
+    }
+  </script>
+  <script>
+    const template = Handlebars.compile(`
+    <h1 onClick=saludar()>{{nombre}}</h1> 
+    <h1>{{apellido}}</h1> 
+    <h1>{{edad}}</h1> 
+    <h1>{{email}}</h1>
+    <h1>{{telefono}}</h1>
+   `); // compila la plantilla
+    const html = template({ nombre: 'Augusto', apellido: 'Silva', edad: '21', email: 'augustoslva@hotmail.com', telefono: '43163157'}); // genera el html
+    document.querySelector('span').innerHTML = html; // inyecta el resultado en la vista
+  </script>
+</body>
+</html>
+
