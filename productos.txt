@@ -1,0 +1,14 @@
+[
+    {
+        "title": "Lapiz",
+        "price": "215",
+        "thumbnail": "https://cdn2.iconfinder.com/data/icons/flat-seo-web-ikooni/128/flat_seo2-32-256.png",
+        "id": 1
+    },
+    {
+        "title": "Reglas",
+        "price": "245",
+        "thumbnail": "https://cdn1.iconfinder.com/data/icons/office-icons-17/512/ilustracoes_04-03-256.png",
+        "id": 2
+    }
+]

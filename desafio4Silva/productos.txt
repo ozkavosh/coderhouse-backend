@@ -1,8 +1,0 @@
-[
-    {
-        "title": "Producto3",
-        "price": "123",
-        "thumbnail": "https://prueba.com/img/3",
-        "id": 1
-    }
-]

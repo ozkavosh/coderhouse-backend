@@ -47,14 +47,7 @@
 
     <div class="container mb-3">
       <h2>Ver productos</h2>
-      <form method="get" enctype="application/json" action="./api/productos/" id="formVerId">
-        <div class="mb-3">
-            <label for="id" class="form-label">ID del producto</label>
-            <input type="number" required class="form-control" onkeydown="updateAction('formVerId', event)"/>
-        </div>
-        <a href="./api/productos"><button type="button" class="btn btn-primary">Ver todos los productos</button></a> 
-        <button type="submit" class="btn btn-primary">Buscar producto por ID</button>
-      </form>
+      <a href="./api/productos" class="btn btn-primary">Ver todos los productos</a>
     </div>
 
     <script

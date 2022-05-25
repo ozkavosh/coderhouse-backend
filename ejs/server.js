@@ -6,8 +6,10 @@ const PORT = 8080;
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-app.use(express.static(__dirname + '/public'));
+app.use(express.static('../public'));
 app.use('/api', router);
+app.set('views', '../views');
+app.set('view engine', 'ejs');
 
 const server = app.listen(PORT, ()=>{
     console.log(`Servidor listo y escuchando en el puerto ${server.address().port}`);
