@@ -103,6 +103,7 @@ const renderProductos = async () => {
                 <!-- Product info-->
                 <p>${p.description}</p>
                 <p>Stock: ${p.stock}</p>
+                <p>Codigo: ${p.code}</p>
                 <p>Actualizado: ${p.timestamp}</p>
                 <!-- Product price-->
                 $${p.price}
@@ -190,8 +191,9 @@ const cargarProducto = async (e) => {
   const name = e.target[0].value;
   const price = e.target[1].value;
   const stock = e.target[2].value;
-  const description = e.target[3].value;
-  const photoUrl = e.target[4].value;
+  const code = e.target[3].value;
+  const description = e.target[4].value;
+  const photoUrl = e.target[5].value;
 
   const productRef = await fetch(
     `https://harvest-diligent-lupin.glitch.me/api/productos/`,
@@ -233,8 +235,9 @@ const editarProducto = async (e) => {
   const name = e.target[0].value;
   const price = e.target[1].value;
   const stock = e.target[2].value;
-  const description = e.target[3].value;
-  const photoUrl = e.target[4].value;
+  const code = e.target[3].value;
+  const description = e.target[4].value;
+  const photoUrl = e.target[5].value;
   const idProducto = e.target.dataset.id;
 
   const productRef = await fetch(
@@ -248,6 +251,7 @@ const editarProducto = async (e) => {
         name,
         price,
         stock,
+        code,
         description,
         photoUrl,
         admin: true,
@@ -294,6 +298,10 @@ const renderEditarProducto = async (e) => {
     <div class="mb-3 col-auto">
         <label for="stock" class="form-label">Stock</label>
         <input type="number" class="form-control" name="stock" value="${producto.stock}" required>
+      </div>
+      <div class="mb-3 col-auto">
+                        <label for="stock" class="form-label">Codigo</label>
+                        <input type="number" class="form-control" name="code" value="${producto.code}" required>
       </div>
     <div class="mb-3 col-7">
       <label for="description" class="form-label">Descripcion</label>

@@ -20,7 +20,7 @@ routerProductos.get("/:id", async (req, res) => {
 
 routerProductos.post("/", middlewares.validarProducto(), async (req, res) => {
   const { admin } = req.body;
-  const { name, price, description, photoUrl, stock } = req.body;
+  const { name, price, description, photoUrl, stock, code } = req.body;
   const timestamp = new Date(Date.now()).toLocaleString();
   admin
     ? res.json(
@@ -30,6 +30,7 @@ routerProductos.post("/", middlewares.validarProducto(), async (req, res) => {
           description,
           photoUrl,
           stock,
+          code,
           timestamp,
         })
       )
@@ -40,13 +41,13 @@ routerProductos.post("/", middlewares.validarProducto(), async (req, res) => {
 
 routerProductos.put("/:id", middlewares.validarProducto(), async (req, res) => {
   const { admin } = req.body;
-  const { name, price, description, photoUrl, stock } = req.body;
+  const { name, price, description, photoUrl, stock, code } = req.body;
   const timestamp = new Date(Date.now()).toLocaleString();
   try {
     admin
       ? res.json(
           await contenedorProductos.update(
-            { name, price, description, photoUrl, stock, timestamp },
+            { name, price, description, photoUrl, stock, code, timestamp },
             req.params.id
           )
         )
