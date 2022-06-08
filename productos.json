@@ -1,14 +1,20 @@
 [
     {
-        "title": "Reglas",
-        "price": "214",
-        "thumbnail": "https://cdn1.iconfinder.com/data/icons/office-icons-17/512/ilustracoes_04-03-256.png",
+        "name": "Jorgiten 215",
+        "price": "163000",
+        "description": "Guitarra",
+        "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRhlKJgp5ko3-k4CGhbibj2RYUKuaTOk2tXzQw8452UpfuMc-xicMUErQXjciEjfStqGY&usqp=CAU",
+        "stock": "5",
+        "timestamp": "8/6/2022 02:16:24",
         "id": 1
     },
     {
-        "title": "Lapiz",
-        "price": "50",
-        "thumbnail": "https://cdn1.iconfinder.com/data/icons/office-icons-17/512/ilustracoes_04-05-512.png",
+        "name": "Jorgiten 215",
+        "price": "163000",
+        "description": "Guitarra",
+        "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRhlKJgp5ko3-k4CGhbibj2RYUKuaTOk2tXzQw8452UpfuMc-xicMUErQXjciEjfStqGY&usqp=CAU",
+        "stock": "5",
+        "timestamp": "8/6/2022 03:05:58",
         "id": 2
     }
 ]

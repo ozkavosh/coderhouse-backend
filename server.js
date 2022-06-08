@@ -1,55 +1,21 @@
+const routerProductos = require('./routerProductos.js');
+const routerCarrito = require('./routerCarrito.js');
 const express = require("express");
-const { Server: IOServer } = require("socket.io");
-const { Server: HTTPServer } = require("http");
-const Contenedor = require("./Contenedor.js");
 const app = express();
-const httpServer = new HTTPServer(app);
-const io = new IOServer(httpServer);
+const cors = require("cors");
+const PORT = 8080;
 
-const contenedorMensajes = new Contenedor("mensajes.json");
-const contenedorProductos = new Contenedor("productos.json");
-
-//Middlewares
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.options('*', cors())
+app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+app.use('/api/productos', routerProductos);
+app.use('/api/carrito', routerCarrito);
 
-app.use(express.static("public"));
-app.set("views", "./views");
-app.set("view engine", "ejs");
-
-const server = httpServer.listen(8080, () => {
-  console.log(
-    `Servidor listo y escuchando en el puerto ${server.address().port}`
-  );
+app.use((req, res, next) => {
+  res.status(404).send({error: '-2', description: `route ${req.path} method ${req.method} not yet implemented`});
 });
 
-app.get("/", async (req, res) => {
-  res.render("layouts/index", {});
-});
-
-app.get("/productos", async (req, res) => {
-  res.render('partials/productRow', {})
-});
-
-app.get("/mensajes", async (req, res) => {
-  res.render('partials/messageRow', {})
-});
-
-io.on("connection", async (socket) => {
-  const productos = await contenedorProductos.getAll();
-  const mensajes = await contenedorMensajes.getAll();
-  socket.emit("productos", productos);
-  socket.emit("mensajes", mensajes);
-
-  socket.on("productoPost", async (producto) => {
-    const productos = await contenedorProductos.save(producto);
-    io.sockets.emit('productos', productos);
-  });
-
-  socket.on("mensajePost", async (mensaje) => {
-    const mensajes = await contenedorMensajes.save({...mensaje, userId: socket.id, date: new Date(Date.now()).toLocaleString()});
-    io.sockets.emit('mensajes', mensajes);
-  })
-});
-
-app.on("error", (err) => console.log(err));
+const server = app.listen(PORT, ()=> {
+  console.log(`Servidor listo y escuchando en ${server.address().port}`);
+})
