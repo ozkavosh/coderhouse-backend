@@ -2,6 +2,7 @@ const { Router } = require('express');
 const routerCarrito = Router();
 const Contenedor = require('./Contenedor.js');
 const contenedorCarrito = new Contenedor('carrito.json');
+const middlewares = require("./middlewares.js");
 
 module.exports = 
 routerCarrito.post('/', async (req, res) => {
@@ -28,7 +29,7 @@ routerCarrito.get('/:id/productos', async (req, res) => {
     }
 })
 
-routerCarrito.post('/:id/productos', async (req, res) => {
+routerCarrito.post('/:id/productos', middlewares.validarProducto(), middlewares.validarId(), async (req, res) => {
     try{
         const {products, id, timestamp} = await contenedorCarrito.getById(req.params.id);
         const productTimestamp = new Date(Date.now()).toLocaleString();
