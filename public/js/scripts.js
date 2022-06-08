@@ -206,6 +206,7 @@ const cargarProducto = async (e) => {
         name,
         price,
         stock,
+        code,
         description,
         photoUrl,
         admin: true,
