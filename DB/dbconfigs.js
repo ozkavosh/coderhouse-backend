@@ -11,7 +11,7 @@ exports.mysqlConfig = {
 exports.sqliteConfig = {
     client: "sqlite",
     connection: {
-        filename: './DB/sqlite/ecommerce.sqlite'
+        filename: './DB/ecommerce.sqlite'
     },
     useNullAsDefault: true,
 };
