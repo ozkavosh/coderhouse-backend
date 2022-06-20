@@ -1,21 +1,60 @@
-const routerProductos = require('./routerProductos.js');
-const routerCarrito = require('./routerCarrito.js');
 const express = require("express");
+const { Server: IOServer } = require("socket.io");
+const { Server: HTTPServer } = require("http");
+const Contenedor = require("./Contenedor.js");
+const { mysqlConfig, sqliteConfig } = require("./DB/dbconfigs.js");
+const { createTables } = require("./createTables.js");
 const app = express();
-const cors = require("cors");
-const PORT = 8080;
+const httpServer = new HTTPServer(app);
+const io = new IOServer(httpServer);
 
-app.use(cors());
-app.options('*', cors())
-app.use(express.urlencoded({extended: true}));
+(async ()=> await createTables())();
+const contenedorMensajes = new Contenedor(sqliteConfig, "mensajes");
+const contenedorProductos = new Contenedor(mysqlConfig, "productos");
+
+//Middlewares
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/api/productos', routerProductos);
-app.use('/api/carrito', routerCarrito);
 
-app.use((req, res, next) => {
-  res.status(404).send({error: '-2', description: `route ${req.path} method ${req.method} not yet implemented`});
+app.use(express.static("public"));
+app.set("views", "./views");
+app.set("view engine", "ejs");
+
+const server = httpServer.listen(8080, () => {
+  console.log(
+    `Servidor listo y escuchando en el puerto ${server.address().port}`
+  );
 });
 
-const server = app.listen(PORT, ()=> {
-  console.log(`Servidor listo y escuchando en ${server.address().port}`);
-})
+app.get("/", async (req, res) => {
+  res.render("layouts/index", {});
+});
+
+app.get("/productos", async (req, res) => {
+  res.render('partials/productRow', {})
+});
+
+app.get("/mensajes", async (req, res) => {
+  res.render('partials/messageRow', {})
+});
+
+io.on("connection", async (socket) => {
+  const productos = await contenedorProductos.getAll();
+  const mensajes = await contenedorMensajes.getAll();
+  socket.emit("productos", productos);
+  socket.emit("mensajes", mensajes);
+
+  socket.on("productoPost", async (producto) => {
+    await contenedorProductos.save(producto);
+    const productos = await contenedorProductos.getAll();
+    io.sockets.emit('productos', productos);
+  });
+
+  socket.on("mensajePost", async (mensaje) => {
+    await contenedorMensajes.save({...mensaje, userId: socket.id, date: new Date(Date.now())});
+    const mensajes = await contenedorMensajes.getAll();
+    io.sockets.emit('mensajes', mensajes);
+  })
+});
+
+app.on("error", (err) => console.log(err));
