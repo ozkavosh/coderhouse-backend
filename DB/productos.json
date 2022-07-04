@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Lenovo G PRO",
+        "price": "12999",
+        "description": "mouse",
+        "photoUrl": "https://s3-sa-east-1.amazonaws.com/saasargentina/oaPmQNJPQeMZynN9AOk5/imagen",
+        "stock": "4",
+        "code": "123",
+        "timestamp": "4/7/2022, 11:33:15",
+        "id": 1
+    },
+    {
+        "name": "Logitech g195",
+        "price": "42999",
+        "description": "Teclado",
+        "photoUrl": "https://resource.logitechg.com/w_1000,c_limit,q_auto,f_auto,dpr_auto/d_transparent.gif/content/dam/gaming/en/products/g915-tkl/g915-tkl-gallery-2-carbon-new.png?v=1",
+        "stock": "44",
+        "code": "312",
+        "timestamp": "4/7/2022, 11:33:40",
+        "id": 2
+    },
+    {
+        "name": "Samsung 22\" FHD",
+        "price": "542999",
+        "description": "Monitor",
+        "photoUrl": "https://images.samsung.com/is/image/samsung/p6pim/ar/lf22t350fhlczb/gallery/ar-t35f-388813-lf22t350fhlczb-456991984?$650_519_PNG$",
+        "stock": "23",
+        "code": "231",
+        "timestamp": "4/7/2022, 11:33:58",
+        "id": 3
+    }
+]
