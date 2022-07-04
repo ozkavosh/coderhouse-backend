@@ -20,7 +20,7 @@ const renderCarrito = async () => {
   if (cartId) {
     document.querySelector("#cartId").innerHTML = cartId.id;
     const cartRef = await fetch(
-      `http://localhost:8080/api/carrito/${cartId.id}/productos`
+      `https://harvest-diligent-lupin.glitch.me/api/carrito/${cartId.id}/productos`
     );
     const cartProducts = await cartRef.json();
 
@@ -70,7 +70,7 @@ const renderCarrito = async () => {
     }
   } else {
     const cartRef = await fetch(
-      "http://localhost:8080/api/carrito",
+      "https://harvest-diligent-lupin.glitch.me/api/carrito",
       { method: "POST" }
     );
     cartItemCount.innerHTML = 0;
@@ -83,7 +83,7 @@ const renderCarrito = async () => {
 
 const renderProductos = async () => {
   const productosRef = await fetch(
-    "http://localhost:8080/api/productos"
+    "https://harvest-diligent-lupin.glitch.me/api/productos"
   );
   const productos = await productosRef.json();
   contenedorProductos.innerHTML = "";
@@ -132,7 +132,7 @@ const agregarAlCarrito = async (e) => {
   if (!e.target.matches(".btnAgregar")) return;
   const idProducto = e.target.dataset.id;
   const productoRef = await fetch(
-    `http://localhost:8080/api/productos/${idProducto}`
+    `https://harvest-diligent-lupin.glitch.me/api/productos/${idProducto}`
   );
   const producto = await productoRef.json();
   if('_id' in producto){
@@ -140,7 +140,7 @@ const agregarAlCarrito = async (e) => {
     delete producto._id;
   }
   const cartRef = await fetch(
-    `http://localhost:8080/api/carrito/${cartId.id}/productos`,
+    `https://harvest-diligent-lupin.glitch.me/api/carrito/${cartId.id}/productos`,
     {
       method: "POST",
       headers: {
@@ -156,7 +156,7 @@ const eliminarDelCarrito = async (e) => {
   if (!e.target.matches(".btnEliminarProducto")) return;
   const idProducto = e.target.dataset.id;
   const cartRef = await fetch(
-    `http://localhost:8080/api/carrito/${cartId.id}/productos/${idProducto}`,
+    `https://harvest-diligent-lupin.glitch.me/api/carrito/${cartId.id}/productos/${idProducto}`,
     {
       method: "DELETE",
     }
@@ -174,7 +174,7 @@ const crearCarrito = async (e) => {
 const eliminarCarrito = async (e) => {
   if (!e.target.matches(".btnEliminarCarrito")) return;
   const cartRef = await fetch(
-    `http://localhost:8080/api/carrito/${cartId.id}`,
+    `https://harvest-diligent-lupin.glitch.me/api/carrito/${cartId.id}`,
     {
       method: "DELETE",
     }
@@ -200,7 +200,7 @@ const cargarProducto = async (e) => {
   const photoUrl = e.target[5].value;
 
   const productRef = await fetch(
-    `http://localhost:8080/api/productos/`,
+    `https://harvest-diligent-lupin.glitch.me/api/productos/`,
     {
       method: "POST",
       headers: {
@@ -246,7 +246,7 @@ const editarProducto = async (e) => {
   const idProducto = e.target.dataset.id;
 
   const productRef = await fetch(
-    `http://localhost:8080/api/productos/${idProducto}`,
+    `https://harvest-diligent-lupin.glitch.me/api/productos/${idProducto}`,
     {
       method: "PUT",
       headers: {
@@ -271,7 +271,7 @@ const borrarProducto = async (e) => {
   const idProducto = e.target.dataset.id;
 
   const productRef = await fetch(
-    `http://localhost:8080/api/productos/${idProducto}`,
+    `https://harvest-diligent-lupin.glitch.me/api/productos/${idProducto}`,
     {
       method: "DELETE",
       headers: {
@@ -287,7 +287,7 @@ const renderEditarProducto = async (e) => {
   if (!e.target.matches(".btnEditarProducto")) return;
   const idProducto = e.target.dataset.id;
   const productoRef = await fetch(
-    `http://localhost:8080/api/productos/${idProducto}`
+    `https://harvest-diligent-lupin.glitch.me/api/productos/${idProducto}`
   );
   const producto = await productoRef.json();
   contenedorProductos.innerHTML = `<form class="row justify-content-center bg-light p-4" id="formEditarProducto" data-id="${producto.id || producto._id}">
