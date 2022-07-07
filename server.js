@@ -1,36 +1,71 @@
-require("dotenv").config();
 const express = require("express");
+const normalizr = require("normalizr");
+const { Server: IOServer } = require("socket.io");
+const { Server: HTTPServer } = require("http");
+const Contenedor = require("./Contenedor.js");
+const crearDatos = require("./utils/crearDatos");
 const app = express();
-const cors = require("cors");
+const httpServer = new HTTPServer(app);
+const io = new IOServer(httpServer);
 
-//Firebase
-if (process.env.STORAGE == "firebase") {
-  const admin = require("firebase-admin");
-  const serviceAccount = require("./config/ecommercecoderhouse-2f872-9d1109101c0e.json");
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
+const contenedorMensajes = new Contenedor("mensajes.json");
+const contenedorProductos = new Contenedor("productos.json");
 
 //Middlewares
-app.use(cors());
-app.options('*', cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use(express.static("public"));
+app.set("views", "./views");
+app.set("view engine", "ejs");
 
-//Routers
-const routerProductos = require("./routers/routerProductos");
-const routerCarritos = require("./routers/routerCarritos");
-app.use("/api/productos", routerProductos);
-app.use("/api/carrito", routerCarritos);
-app.use((req, res, next) => {
-  res.status(404).send({error: '-2', description: `route ${req.path} method ${req.method} not yet implemented`});
+//Normalizr
+const authorSchema = new normalizr.schema.Entity('author');
+const messagesSchema = new normalizr.schema.Entity('messages', { author: authorSchema });
+const chatSchema = new normalizr.schema.Entity('chat', { 
+  messages: [messagesSchema]
+})
+
+const server = httpServer.listen(8080, () => {
+  console.log(
+    `Servidor listo y escuchando en el puerto ${server.address().port}`
+  );
 });
 
-app.listen(8080, () => {
-  console.log("Listening on port 8080");
+app.get("/", (req, res) => {
+  res.render("layouts/index", {});
 });
 
-app.on("error", console.error);
+app.get("/productos", (req, res) => {
+  res.render('partials/productRow', {})
+});
+
+app.get("/mensajes", (req, res) => {
+  res.render('partials/messageRow', {})
+});
+
+app.get("/api/productos-test", (req, res) => {
+  const productos = crearDatos();
+  res.type('json').send(JSON.stringify(productos, null, 4));
+})
+
+io.on("connection", async (socket) => {
+  const productos = await contenedorProductos.getAll();
+  const arrayMensajes = await contenedorMensajes.getAll();
+  const mensajes = normalizr.normalize({ messages: arrayMensajes, id: 'chat' }, chatSchema);
+  
+  socket.emit("productos", productos);
+  socket.emit("mensajes", mensajes);
+
+  socket.on("productoPost", async (producto) => {
+    const productos = await contenedorProductos.save(producto);
+    io.sockets.emit('productos', productos);
+  });
+
+  socket.on("mensajePost", async (mensaje) => {
+    const mensajes = await contenedorMensajes.save({...mensaje, date: new Date(Date.now()).toLocaleString()});
+    io.sockets.emit('mensajes', mensajes);
+  })
+});
+
+app.on("error", (err) => console.log(err));
