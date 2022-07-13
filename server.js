@@ -10,6 +10,8 @@ const crearDatos = require("./utils/crearDatos");
 const app = express();
 const httpServer = new HTTPServer(app);
 const io = new IOServer(httpServer);
+const dotenv = require("dotenv");
+dotenv.config();
 
 const contenedorMensajes = new Contenedor("mensajes.json");
 const contenedorProductos = new Contenedor("productos.json");
@@ -20,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(session({
   store: MongoStore.create({
-    mongoUrl: 'mongodb+srv://ozkavosh:v7dIAZIKkLVVr5mo@cluster0.y6plr.mongodb.net/desafio-sessions?retryWrites=true&w=majority',
+    mongoUrl: `mongodb+srv://ozkavosh:${process.env.MONGO_PASS}@cluster0.y6plr.mongodb.net/desafio-sessions?retryWrites=true&w=majority`,
     mongoOptions: {
       useNewUrlParser: true,
       useUnifiedTopology: true,
