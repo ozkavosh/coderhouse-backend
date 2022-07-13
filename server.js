@@ -1,5 +1,8 @@
 const express = require("express");
 const normalizr = require("normalizr");
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const { Server: IOServer } = require("socket.io");
 const { Server: HTTPServer } = require("http");
 const Contenedor = require("./Contenedor.js");
@@ -14,7 +17,25 @@ const contenedorProductos = new Contenedor("productos.json");
 //Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
+app.use(session({
+  store: MongoStore.create({
+    mongoUrl: 'mongodb+srv://ozkavosh:v7dIAZIKkLVVr5mo@cluster0.y6plr.mongodb.net/desafio-sessions?retryWrites=true&w=majority',
+    mongoOptions: {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  }),
+  secret: "qwerty",
+  rolling: true,
+  resave: true,
+  saveUninitialized: false,
+  cookie: { 
+    maxAge: 600 * 1000
+  }
+}))
 
+//EJS
 app.use(express.static("public"));
 app.set("views", "./views");
 app.set("view engine", "ejs");
@@ -26,15 +47,27 @@ const chatSchema = new normalizr.schema.Entity('chat', {
   messages: [messagesSchema]
 })
 
-const server = httpServer.listen(8080, () => {
-  console.log(
-    `Servidor listo y escuchando en el puerto ${server.address().port}`
-  );
+//Endpoints
+app.get("/", (req, res) => {
+  const nombre = req.session.nombre;
+  res.render("layouts/index", { nombre });
 });
 
-app.get("/", (req, res) => {
-  res.render("layouts/index", {});
-});
+app.post("/login", (req, res) => {
+  const { nombre } = req.body;
+  req.session.nombre = nombre;
+  res.json({ success: true });
+})
+
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if(err){
+      console.log(err.message);
+    }
+
+    res.status(204).end();
+  });
+})
 
 app.get("/productos", (req, res) => {
   res.render('partials/productRow', {})
@@ -48,7 +81,9 @@ app.get("/api/productos-test", (req, res) => {
   const productos = crearDatos();
   res.type('json').send(JSON.stringify(productos, null, 4));
 })
+app.on("error", (err) => console.log(err));
 
+//Websockets
 io.on("connection", async (socket) => {
   const productos = await contenedorProductos.getAll();
   const arrayMensajes = await contenedorMensajes.getAll();
@@ -68,4 +103,9 @@ io.on("connection", async (socket) => {
   })
 });
 
-app.on("error", (err) => console.log(err));
+const server = httpServer.listen(8080, () => {
+  console.log(
+    `Servidor listo y escuchando en el puerto ${server.address().port}`
+  );
+});
+
