@@ -100,7 +100,9 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("mensajePost", async (mensaje) => {
-    const mensajes = await contenedorMensajes.save({...mensaje, date: new Date(Date.now()).toLocaleString()});
+    const arrayMensajes = await contenedorMensajes.save({...mensaje, date: new Date(Date.now()).toLocaleString()});
+    const mensajes = normalizr.normalize({ messages: arrayMensajes, id: 'chat' }, chatSchema);
+
     io.sockets.emit('mensajes', mensajes);
   })
 });
