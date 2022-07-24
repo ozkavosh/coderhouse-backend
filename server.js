@@ -1,110 +1,95 @@
 const express = require("express");
-const normalizr = require("normalizr");
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
 const { Server: IOServer } = require("socket.io");
 const { Server: HTTPServer } = require("http");
+const session = require("express-session");
+const passport = require("./passport");
+const MongoStore = require("connect-mongo");
+const normalizr = require("normalizr");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const flash = require("connect-flash");
 const Contenedor = require("./Contenedor.js");
-const crearDatos = require("./utils/crearDatos");
+const { chatSchema } = require("./utils/normalizrSchemas");
 const app = express();
 const httpServer = new HTTPServer(app);
 const io = new IOServer(httpServer);
-const dotenv = require("dotenv");
+const routerCuenta = require("./routers/routerCuenta");
+const routerProductos = require("./routers/routerProductos");
+const routerMensajes = require("./routers/routerMensajes");
 dotenv.config();
+
+mongoose.connect(
+  `mongodb+srv://ozkavosh:${process.env.MONGO_PASS}@cluster0.y6plr.mongodb.net/users?retryWrites=true&w=majority`
+);
 
 const contenedorMensajes = new Contenedor("mensajes.json");
 const contenedorProductos = new Contenedor("productos.json");
 
 //Middlewares
+app.use(flash());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser());
-app.use(session({
-  store: MongoStore.create({
-    mongoUrl: `mongodb+srv://ozkavosh:${process.env.MONGO_PASS}@cluster0.y6plr.mongodb.net/desafio-sessions?retryWrites=true&w=majority`,
-    mongoOptions: {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  }),
-  secret: "qwerty",
-  rolling: true,
-  resave: true,
-  saveUninitialized: false,
-  cookie: { 
-    maxAge: 600 * 1000
-  }
-}))
+app.use(
+  session({
+    store: MongoStore.create({
+      mongoUrl: `mongodb+srv://ozkavosh:${process.env.MONGO_PASS}@cluster0.y6plr.mongodb.net/desafio-sessions?retryWrites=true&w=majority`,
+      mongoOptions: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      },
+    }),
+    secret: "qwerty",
+    rolling: true,
+    resave: true,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 600 * 1000,
+    },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 //EJS
 app.use(express.static("public"));
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
-//Normalizr
-const authorSchema = new normalizr.schema.Entity('author');
-const messagesSchema = new normalizr.schema.Entity('messages', { author: authorSchema });
-const chatSchema = new normalizr.schema.Entity('chat', { 
-  messages: [messagesSchema]
-})
-
 //Endpoints
-app.get("/", (req, res) => {
-  const nombre = req.session.nombre;
-  res.render("layouts/index", { nombre });
-});
-
-app.post("/login", (req, res) => {
-  const { nombre } = req.body;
-  req.session.nombre = nombre;
-  res.json({ success: true });
-})
-
-app.get('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if(err){
-      console.log(err.message);
-    }
-
-    res.status(204).end();
-  });
-})
-
-app.get("/productos", (req, res) => {
-  res.render('partials/productRow', {})
-});
-
-app.get("/mensajes", (req, res) => {
-  res.render('partials/messageRow', {})
-});
-
-app.get("/api/productos-test", (req, res) => {
-  const productos = crearDatos();
-  res.type('json').send(JSON.stringify(productos, null, 4));
-})
+app.use(routerCuenta);
+app.use(routerProductos);
+app.use(routerMensajes);
 app.on("error", (err) => console.log(err));
 
 //Websockets
 io.on("connection", async (socket) => {
   const productos = await contenedorProductos.getAll();
   const arrayMensajes = await contenedorMensajes.getAll();
-  const mensajes = normalizr.normalize({ messages: arrayMensajes, id: 'chat' }, chatSchema);
-  
+  const mensajes = normalizr.normalize(
+    { messages: arrayMensajes, id: "chat" },
+    chatSchema
+  );
+
   socket.emit("productos", productos);
   socket.emit("mensajes", mensajes);
 
   socket.on("productoPost", async (producto) => {
     const productos = await contenedorProductos.save(producto);
-    io.sockets.emit('productos', productos);
+    io.sockets.emit("productos", productos);
   });
 
   socket.on("mensajePost", async (mensaje) => {
-    const arrayMensajes = await contenedorMensajes.save({...mensaje, date: new Date(Date.now()).toLocaleString()});
-    const mensajes = normalizr.normalize({ messages: arrayMensajes, id: 'chat' }, chatSchema);
+    const arrayMensajes = await contenedorMensajes.save({
+      ...mensaje,
+      date: new Date(Date.now()).toLocaleString(),
+    });
+    const mensajes = normalizr.normalize(
+      { messages: arrayMensajes, id: "chat" },
+      chatSchema
+    );
 
-    io.sockets.emit('mensajes', mensajes);
-  })
+    io.sockets.emit("mensajes", mensajes);
+  });
 });
 
 const server = httpServer.listen(8080, () => {
@@ -112,4 +97,3 @@ const server = httpServer.listen(8080, () => {
     `Servidor listo y escuchando en el puerto ${server.address().port}`
   );
 });
-

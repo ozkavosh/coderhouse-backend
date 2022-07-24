@@ -65,17 +65,14 @@ const loguear = async (e) => {
 };
 
 const desloguear = async (e) => {
-  const respuestaRef = await fetch("logout");
+  await fetch("logout");
+  
   const tituloBienvenida = document.querySelector('.tituloBienvenida');
-  const contenedorFormProductos = document.querySelector('.contenedorFormProductos');
-  const contenedorChat = document.querySelector('.contenedorChat');
-  const btnDesloguear = document.querySelector('.btnDesloguear');
-  const tablaProductos = document.querySelector('#tablaProductos');
+  document.querySelector('.contenedorFormProductos').remove();
+  document.querySelector('.contenedorChat').remove();
+  document.querySelector('.btnDesloguear').remove();
+  document.querySelector('#tablaProductos').remove();
   tituloBienvenida.innerText = tituloBienvenida.innerText.replace("Bienvenido",'Hasta pronto');
-  contenedorFormProductos.remove();
-  contenedorChat.remove();
-  tablaProductos.remove();
-  btnDesloguear.remove();
 
   setTimeout(() => { location.reload() }, 2000)
 }
