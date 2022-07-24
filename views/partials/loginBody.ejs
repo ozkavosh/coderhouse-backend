@@ -1,0 +1,24 @@
+<div class="container">
+  <div class="row bg-secondary mt-2 p-2">
+    <div class="col-12">
+      <h2>Ingresar</h2>
+      <% if (error) { %>
+        <div class="row bg-danger text-white">
+          <p class="fw-bold"><%= error %></p>
+        </div>
+        <% } %>
+    </div>
+    <form action="/login" method="post" class="col">
+      <label for="username" class="form-label">Email</label>
+      <input type="email" name="username" class="form-control" />
+
+      <label for="password" class="form-label">Contraseña</label>
+      <input type="text" name="password" class="form-control" />
+      <button type="submit" class="btn btn-primary mt-2">Ingresar</button>
+    </form>
+
+    <div class="col-12 mt-2">
+      <a href="/signup" class="btn btn-primary">Ir a registrar</a>
+    </div>
+  </div>
+</div>
