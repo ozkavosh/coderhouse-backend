@@ -16,6 +16,10 @@ const io = new IOServer(httpServer);
 const routerCuenta = require("./routers/routerCuenta");
 const routerProductos = require("./routers/routerProductos");
 const routerMensajes = require("./routers/routerMensajes");
+const routerInfo = require("./routers/routerInfo");
+const routerRandom = require("./routers/routerRandom");
+const minimist = require("minimist");
+const argv = minimist(process.argv.slice(2));
 dotenv.config();
 
 mongoose.connect(
@@ -59,6 +63,8 @@ app.set("view engine", "ejs");
 app.use(routerCuenta);
 app.use(routerProductos);
 app.use(routerMensajes);
+app.use(routerInfo);
+app.use(routerRandom);
 app.on("error", (err) => console.log(err));
 
 //Websockets
@@ -92,7 +98,9 @@ io.on("connection", async (socket) => {
   });
 });
 
-const server = httpServer.listen(8080, () => {
+const PORT = argv.puerto || argv.PUERTO || argv.port || argv.PORT || 8080;
+
+const server = httpServer.listen(PORT, () => {
   console.log(
     `Servidor listo y escuchando en el puerto ${server.address().port}`
   );
