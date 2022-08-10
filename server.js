@@ -8,6 +8,8 @@ const normalizr = require("normalizr");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const flash = require("connect-flash");
+const cluster = require("cluster");
+const numCpus = require("os").cpus().length;
 const Contenedor = require("./Contenedor.js");
 const { chatSchema } = require("./utils/normalizrSchemas");
 const app = express();
@@ -20,6 +22,8 @@ const routerInfo = require("./routers/routerInfo");
 const routerRandom = require("./routers/routerRandom");
 const minimist = require("minimist");
 const argv = minimist(process.argv.slice(2));
+const PORT = argv.puerto || argv.PUERTO || argv.port || argv.PORT || 8080;
+const mode = argv.mode || argv.MODE || argv.modo || argv.MODO || "FORK";
 dotenv.config();
 
 mongoose.connect(
@@ -65,6 +69,11 @@ app.use(routerProductos);
 app.use(routerMensajes);
 app.use(routerInfo);
 app.use(routerRandom);
+
+app.get("/datos", (req, res) => {
+  return res.json({ success: true });
+});
+
 app.on("error", (err) => console.log(err));
 
 //Websockets
@@ -98,10 +107,14 @@ io.on("connection", async (socket) => {
   });
 });
 
-const PORT = argv.puerto || argv.PUERTO || argv.port || argv.PORT || 8080;
-
-const server = httpServer.listen(PORT, () => {
-  console.log(
-    `Servidor listo y escuchando en el puerto ${server.address().port}`
-  );
-});
+if (cluster.isMaster && mode == "CLUSTER") {
+  for (let i = 0; i < numCpus; i++) {
+    cluster.fork();
+  }
+} else {
+  const server = httpServer.listen(PORT, () => {
+    console.log(
+      `Servidor listo y escuchando en el puerto ${server.address().port} Modo: ${mode}`
+    );
+  });
+}
