@@ -1,11 +1,10 @@
 const { Router } = require("express");
+const {routeLogger} = require("../middlewares/logger");
+const calcular = require("../utils/calcular");
 const routerRandom = Router();
-const { fork } = require("child_process");
 
 module.exports = 
-    routerRandom.get('/api/random', (req, res) => {
-        const child = fork('./utils/calcular.js');
-        child.send({ cant: req.query.cant || 100000000 });
-
-        child.on('message', (message) => res.type('json').send(JSON.stringify(message,null,2)));
+    routerRandom.get('/api/random', routeLogger, (req, res) => {
+        const result = calcular(req.query.cant || 10000);
+        res.type('json').send(JSON.stringify(result,null,2));
     });

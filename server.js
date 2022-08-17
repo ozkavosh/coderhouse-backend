@@ -21,11 +21,13 @@ const routerMensajes = require("./routers/routerMensajes");
 const routerInfo = require("./routers/routerInfo");
 const routerRandom = require("./routers/routerRandom");
 const minimist = require("minimist");
+const {invalidRouteLogger} = require("./middlewares/logger");
 const argv = minimist(process.argv.slice(2));
 const PORT = argv.puerto || argv.PUERTO || argv.port || argv.PORT || 8080;
 const mode = argv.mode || argv.MODE || argv.modo || argv.MODO || "FORK";
 dotenv.config();
 
+//MongoDb
 mongoose.connect(
   `mongodb+srv://ozkavosh:${process.env.MONGO_PASS}@cluster0.y6plr.mongodb.net/users?retryWrites=true&w=majority`
 );
@@ -69,9 +71,8 @@ app.use(routerProductos);
 app.use(routerMensajes);
 app.use(routerInfo);
 app.use(routerRandom);
-
-app.get("/datos", (req, res) => {
-  return res.json({ success: true });
+app.use(invalidRouteLogger, (req, res, next) => {
+  res.status(404).json({ error: `${req.baseUrl}${req.path} method ${req.method} not yet implemented` })
 });
 
 app.on("error", (err) => console.log(err));
