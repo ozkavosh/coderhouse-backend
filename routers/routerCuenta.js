@@ -1,52 +1,49 @@
 const { Router } = require("express");
-const passport = require("../passport");
-const authRoute = require("../middlewares/authRoute");
-const { routeLogger } = require("../middlewares/logger");
+const { rutaProtegida } = require("../middlewares");
 const routerCuenta = Router();
+const passport = require("../utils/passport");
+const upload = require("../utils/upload");
 
-module.exports = routerCuenta.get("/", routeLogger, authRoute, (req, res) => {
-  res.render("layouts/index", { nombre: req.user.username });
-});
-
-routerCuenta.get("/login", routeLogger, (req, res) => {
-  if (req.isUnauthenticated()) {
-    res.render("layouts/login", { error: req.flash("error")[0] });
-  } else {
-    res.redirect("/");
-  }
-});
-
-routerCuenta.post(
+module.exports = routerCuenta.post(
   "/login",
-  routeLogger,
-  passport.authenticate("login", {
-    failureRedirect: "/login",
-    failureFlash: true,
-  }),
+  passport.authenticate("login", { failureRedirect: `/api/cuenta/error?error="wrongCredentials"` }),
   (req, res) => {
-    res.redirect("/");
+    res.json({ success: true, clientId: req.user._id || req.user.id });
   }
 );
 
-routerCuenta.get("/signup", routeLogger, (req, res) => {
-  res.render("layouts/signup", { error: req.flash("error")[0] });
-});
+routerCuenta.get('/verify', (req, res) => {
+  if(req.isAuthenticated()){
+    return res.json({ authentication: true });
+  }
+
+  return res.json({ authentication: false });
+})
+
+routerCuenta.get('/error', (req, res) => {
+  const error = req.query.error;
+  if(error){
+    return res.json({ error })
+  }
+
+  return res.json({ error: "Unkown error" })
+})
+
+routerCuenta.get('/perfil', rutaProtegida(), (req, res) => {
+    res.json(req.user);
+})
 
 routerCuenta.post(
-  "/signup",
-  routeLogger,
-  passport.authenticate("signup", {
-    failureRedirect: "/signup",
-    failureFlash: true,
-  }),
+  "/nuevo",
+  upload.single("avatar"),
+  passport.authenticate("signup", { failureRedirect: `/api/cuenta/error?error="wrongCredentials"` }),
   (req, res) => {
-    res.redirect("/login");
+    res.json({ success: true });
   }
 );
 
-routerCuenta.get("/logout", routeLogger, (req, res) => {
-  req.logout({ keepSessionInfo: false }, (err) => {
-    if (err) console.log(err);
-    res.redirect("/login");
-  });
-});
+routerCuenta.get("/logout", rutaProtegida(), (req, res) => {
+    req.logout({ keepSessionInfo: false }, () => {
+        return res.json({ success: true });
+    });
+})

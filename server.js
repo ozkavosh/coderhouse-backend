@@ -1,48 +1,40 @@
+require("dotenv").config();
 const express = require("express");
-const { Server: IOServer } = require("socket.io");
-const { Server: HTTPServer } = require("http");
-const session = require("express-session");
-const passport = require("./passport");
-const MongoStore = require("connect-mongo");
-const normalizr = require("normalizr");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const flash = require("connect-flash");
-const cluster = require("cluster");
-const numCpus = require("os").cpus().length;
-const Contenedor = require("./Contenedor.js");
-const { chatSchema } = require("./utils/normalizrSchemas");
 const app = express();
-const httpServer = new HTTPServer(app);
-const io = new IOServer(httpServer);
-const routerCuenta = require("./routers/routerCuenta");
-const routerProductos = require("./routers/routerProductos");
-const routerMensajes = require("./routers/routerMensajes");
-const routerInfo = require("./routers/routerInfo");
-const routerRandom = require("./routers/routerRandom");
-const minimist = require("minimist");
-const {invalidRouteLogger} = require("./middlewares/logger");
-const argv = minimist(process.argv.slice(2));
-const PORT = argv.puerto || argv.PUERTO || argv.port || argv.PORT || 8080;
-const mode = argv.mode || argv.MODE || argv.modo || argv.MODO || "FORK";
-dotenv.config();
+const cors = require("cors");
+const session = require("express-session");
+const passport = require("./utils/passport");
+const MongoStore = require("connect-mongo");
+const mongoose = require("mongoose");
+const logger = require("./utils/logger");
+const cluster = require("cluster");
 
-//MongoDb
+//Firebase
+if (process.env.STORAGE == "firebase") {
+  const admin = require("firebase-admin");
+  const serviceAccount = require("./config/ecommercecoderhouse-2f872-9d1109101c0e.json");
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
+
+//Mongo
 mongoose.connect(
-  `mongodb+srv://ozkavosh:${process.env.MONGO_PASS}@cluster0.y6plr.mongodb.net/users?retryWrites=true&w=majority`
+  "mongodb+srv://ozkavosh:v7dIAZIKkLVVr5mo@cluster0.y6plr.mongodb.net/users?retryWrites=true&w=majority",
+  () => logger.debug("Conectado a mongo")
 );
 
-const contenedorMensajes = new Contenedor("mensajes.json");
-const contenedorProductos = new Contenedor("productos.json");
-
 //Middlewares
-app.use(flash());
+app.use(cors());
+app.options("*", cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static("public"));
 app.use(
   session({
     store: MongoStore.create({
-      mongoUrl: `mongodb+srv://ozkavosh:${process.env.MONGO_PASS}@cluster0.y6plr.mongodb.net/desafio-sessions?retryWrites=true&w=majority`,
+      mongoUrl: `mongodb+srv://ozkavosh:v7dIAZIKkLVVr5mo@cluster0.y6plr.mongodb.net/desafio-sessions?retryWrites=true&w=majority`,
       mongoOptions: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -60,62 +52,30 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-//EJS
-app.use(express.static("public"));
-app.set("views", "./views");
-app.set("view engine", "ejs");
-
-//Endpoints
-app.use(routerCuenta);
-app.use(routerProductos);
-app.use(routerMensajes);
-app.use(routerInfo);
-app.use(routerRandom);
-app.use(invalidRouteLogger, (req, res, next) => {
-  res.status(404).json({ error: `${req.baseUrl}${req.path} method ${req.method} not yet implemented` })
-});
-
-app.on("error", (err) => console.log(err));
-
-//Websockets
-io.on("connection", async (socket) => {
-  const productos = await contenedorProductos.getAll();
-  const arrayMensajes = await contenedorMensajes.getAll();
-  const mensajes = normalizr.normalize(
-    { messages: arrayMensajes, id: "chat" },
-    chatSchema
-  );
-
-  socket.emit("productos", productos);
-  socket.emit("mensajes", mensajes);
-
-  socket.on("productoPost", async (producto) => {
-    const productos = await contenedorProductos.save(producto);
-    io.sockets.emit("productos", productos);
-  });
-
-  socket.on("mensajePost", async (mensaje) => {
-    const arrayMensajes = await contenedorMensajes.save({
-      ...mensaje,
-      date: new Date(Date.now()).toLocaleString(),
+//Routers
+const routerProductos = require("./routers/routerProductos");
+const routerCarritos = require("./routers/routerCarritos");
+const routerCuenta = require("./routers/routerCuenta");
+app.use("/api/productos", routerProductos);
+app.use("/api/carrito", routerCarritos);
+app.use("/api/cuenta", routerCuenta);
+app.use((req, res, next) => {
+  res
+    .status(404)
+    .send({
+      error: "-2",
+      description: `route ${req.path} method ${req.method} not yet implemented`,
     });
-    const mensajes = normalizr.normalize(
-      { messages: arrayMensajes, id: "chat" },
-      chatSchema
-    );
-
-    io.sockets.emit("mensajes", mensajes);
-  });
 });
 
-if (cluster.isMaster && mode == "CLUSTER") {
-  for (let i = 0; i < numCpus; i++) {
+if (cluster.isMaster && process.env.MODE === "CLUSTER") {
+  for (let i = 0; i < require("os").cpus().length; i++) {
     cluster.fork();
   }
 } else {
-  const server = httpServer.listen(PORT, () => {
-    console.log(
-      `Servidor listo y escuchando en el puerto ${server.address().port} Modo: ${mode}`
-    );
+  const server = app.listen(8080, () => {
+    logger.debug("Listening on port 8080");
   });
 }
+
+app.on("error", console.error);
