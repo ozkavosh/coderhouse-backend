@@ -9,7 +9,7 @@ const contenedorPerfil = document.querySelector("#contenedorPerfil");
 
 (async () => {
   try {
-    const request = await fetch("http://localhost:8080/api/cuenta/verify");
+    const request = await fetch("https://ch-backend-silva.herokuapp.com/api/cuenta/verify");
     const { authentication } = await request.json();
 
     if (!authentication) {
@@ -45,12 +45,12 @@ if (!admin) {
 }
 
 const renderPerfil = async () => {
-  const request = await fetch("http://localhost:8080/api/cuenta/perfil");
+  const request = await fetch("https://ch-backend-silva.herokuapp.com/api/cuenta/perfil");
   const response = await request.json();
 
   contenedorPerfil.innerHTML += `
   <div class="text-center">
-  <img src="http://localhost:8080${response.avatar.replace(
+  <img src="https://ch-backend-silva.herokuapp.com${response.avatar.replace(
     "/public",
     ""
   )}" alt="avatar" class="avatarImg"/>
@@ -72,7 +72,7 @@ const renderPerfil = async () => {
 const logout = async (e) => {
   if (!e.target.matches(".btnLogout")) return;
 
-  await fetch("http://localhost:8080/api/cuenta/logout");
+  await fetch("https://ch-backend-silva.herokuapp.com/api/cuenta/logout");
 
   location.href = "./login.html";
 };
@@ -136,7 +136,7 @@ const renderCarrito = async () => {
 };
 
 const renderProductos = async () => {
-  const productosRef = await fetch("http://localhost:8080/api/productos");
+  const productosRef = await fetch("https://ch-backend-silva.herokuapp.com/api/productos");
   const productos = await productosRef.json();
   contenedorProductos.innerHTML = "";
   for (let p of productos) {
@@ -185,7 +185,7 @@ const agregarAlCarrito = async (e) => {
   const cartId = sessionStorage.getItem("cartId");
   const idProducto = e.target.dataset.id;
   const productoRef = await fetch(
-    `http://localhost:8080/api/productos/${idProducto}`
+    `https://ch-backend-silva.herokuapp.com/api/productos/${idProducto}`
   );
   const producto = await productoRef.json();
   if ("_id" in producto) {
@@ -271,7 +271,7 @@ const cargarProducto = async (e) => {
   const description = e.target[4].value;
   const photoUrl = e.target[5].value;
 
-  const productRef = await fetch(`http://localhost:8080/api/productos/`, {
+  const productRef = await fetch(`https://ch-backend-silva.herokuapp.com/api/productos/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -315,7 +315,7 @@ const editarProducto = async (e) => {
   const idProducto = e.target.dataset.id;
 
   const productRef = await fetch(
-    `http://localhost:8080/api/productos/${idProducto}`,
+    `https://ch-backend-silva.herokuapp.com/api/productos/${idProducto}`,
     {
       method: "PUT",
       headers: {
@@ -340,7 +340,7 @@ const borrarProducto = async (e) => {
   const idProducto = e.target.dataset.id;
 
   const productRef = await fetch(
-    `http://localhost:8080/api/productos/${idProducto}`,
+    `https://ch-backend-silva.herokuapp.com/api/productos/${idProducto}`,
     {
       method: "DELETE",
       headers: {
@@ -356,7 +356,7 @@ const renderEditarProducto = async (e) => {
   if (!e.target.matches(".btnEditarProducto")) return;
   const idProducto = e.target.dataset.id;
   const productoRef = await fetch(
-    `http://localhost:8080/api/productos/${idProducto}`
+    `https://ch-backend-silva.herokuapp.com/api/productos/${idProducto}`
   );
   const producto = await productoRef.json();
   contenedorProductos.innerHTML = `<form class="row justify-content-center bg-light p-4" id="formEditarProducto" data-id="${
