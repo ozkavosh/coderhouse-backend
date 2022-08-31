@@ -22,14 +22,14 @@ const contenedorPerfil = document.querySelector("#contenedorPerfil");
 
 const getCartId = async () => {
   const clientId = sessionStorage.getItem("clientId");
-  const request = await fetch(`http://localhost:8080/api/carrito/${clientId}`);
+  const request = await fetch(`https://ch-backend-silva.herokuapp.com/${clientId}`);
   const { cartId } = await request.json();
 
   if (cartId) {
     sessionStorage.setItem("cartId", cartId);
   } else {
     const request = await fetch(
-      `http://localhost:8080/api/carrito/?clientId=${clientId}`,
+      `https://ch-backend-silva.herokuapp.com/?clientId=${clientId}`,
       { method: "POST" }
     );
     const { id } = await request.json();
@@ -81,7 +81,7 @@ const renderCarrito = async () => {
   const cartId = sessionStorage.getItem("cartId");
   document.querySelector("#cartId").innerHTML = cartId;
   const cartRef = await fetch(
-    `http://localhost:8080/api/carrito/${cartId}/productos`
+    `https://ch-backend-silva.herokuapp.com/${cartId}/productos`
   );
   const cartProducts = await cartRef.json();
 
@@ -193,7 +193,7 @@ const agregarAlCarrito = async (e) => {
     delete producto._id;
   }
   const cartRef = await fetch(
-    `http://localhost:8080/api/carrito/${cartId}/productos`,
+    `https://ch-backend-silva.herokuapp.com/${cartId}/productos`,
     {
       method: "POST",
       headers: {
@@ -210,7 +210,7 @@ const eliminarDelCarrito = async (e) => {
   const cartId = sessionStorage.getItem("cartId");
   const idProducto = e.target.dataset.id;
   const cartRef = await fetch(
-    `http://localhost:8080/api/carrito/${cartId}/productos/${idProducto}`,
+    `https://ch-backend-silva.herokuapp.com/${cartId}/productos/${idProducto}`,
     {
       method: "DELETE",
     }
@@ -230,7 +230,7 @@ const eliminarCarrito = async (e) => {
   if (!e.target.matches(".btnEliminarCarrito")) return;
   const cartId = sessionStorage.getItem("cartId");
   const cartRef = await fetch(
-    `http://localhost:8080/api/carrito/${cartId}`,
+    `https://ch-backend-silva.herokuapp.com/${cartId}`,
     {
       method: "DELETE",
     }
@@ -249,7 +249,7 @@ const comprarCarrito = async (e) => {
   if(!e.target.matches(".btnComprarCarrito")) return;
   const cartId = sessionStorage.getItem("cartId");
 
-  const request = await fetch(`http://localhost:8080/api/carrito/${cartId}/purchase`);
+  const request = await fetch(`https://ch-backend-silva.herokuapp.com/${cartId}/purchase`);
   const response = await request.json();
 
   if(response.success){

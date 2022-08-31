@@ -1,6 +1,6 @@
 (async () => {
   try {
-    const request = await fetch("http://localhost:8080/api/cuenta/verify");
+    const request = await fetch("https://ch-backend-silva.herokuapp.com/api/cuenta/verify");
     const { authentication } = await request.json();
 
     if (authentication) {
@@ -17,7 +17,7 @@ const login = async (e) => {
 
   const { username, password } = e.target;
 
-  const request = await fetch("http://localhost:8080/api/cuenta/login", {
+  const request = await fetch("https://ch-backend-silva.herokuapp.com/api/cuenta/login", {
     method: "POST",
     body: JSON.stringify({
       username: username.value,
@@ -53,7 +53,7 @@ const createNew = async (e) => {
   formData.append("cellphone", cellphone.value);
   formData.append("age", age.value);
 
-  const request = await fetch("http://localhost:8080/api/cuenta/nuevo", {
+  const request = await fetch("https://ch-backend-silva.herokuapp.com/api/cuenta/nuevo", {
     method: "POST",
     body: formData,
   });
