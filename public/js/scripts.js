@@ -81,7 +81,7 @@ const renderCarrito = async () => {
   const cartId = sessionStorage.getItem("cartId");
   document.querySelector("#cartId").innerHTML = cartId;
   const cartRef = await fetch(
-    `https://ch-backend-silva.herokuapp.com/${cartId}/productos`
+    `https://ch-backend-silva.herokuapp.com/api/carrito/${cartId}/productos`
   );
   const cartProducts = await cartRef.json();
 
