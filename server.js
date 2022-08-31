@@ -73,7 +73,7 @@ if (cluster.isMaster && process.env.MODE === "CLUSTER") {
     cluster.fork();
   }
 } else {
-  const server = app.listen(8080, () => {
+  const server = app.listen(process.env.PORT || 8080, () => {
     logger.debug("Listening on port 8080");
   });
 }
