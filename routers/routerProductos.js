@@ -39,7 +39,7 @@ routerProductos.post("/", middlewares.validarProducto(), async (req, res) => {
         res.json({ success: true })
       )
     : res.status(401).json({
-        error: "Unauthorized - You dont have permission to post products",
+        error: "Unauthorized - You don't have permission to post products",
       });
 });
 
@@ -56,7 +56,7 @@ routerProductos.put("/:id", async (req, res) => {
         }),
         res.json(await contenedorProductos.getById(req.params.id)))
       : res.status(401).json({
-          error: "Unauthorized - You dont have permission to update products",
+          error: "Unauthorized - You don't have permission to update products",
         });
   } catch {
     res.status(404).json({ error: "Product not found!" });
@@ -70,7 +70,7 @@ routerProductos.delete("/:id", async (req, res) => {
       ? (await contenedorProductos.deleteById(req.params.id),
         res.json({ success: true }))
       : res.status(401).json({
-          error: "Unauthorized - You dont have permission to delete products",
+          error: "Unauthorized - You don't have permission to delete products",
         });
   } catch {
     res.status(404).json({ error: "Product not found!" });

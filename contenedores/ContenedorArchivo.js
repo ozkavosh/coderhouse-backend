@@ -22,7 +22,7 @@ module.exports = class ContenedorArchivo {
       const file = await fs.readFile(this.route, "utf8");
       return JSON.parse(file);
     } catch {
-      console.error("No se encontro el archivo, se creará uno");
+      console.error("No se encontró el archivo, se creará uno");
       await fs.writeFile(this.route, JSON.stringify([], null, 4), "utf8");
       return [];
     }
